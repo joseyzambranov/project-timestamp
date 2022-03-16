@@ -20,5 +20,8 @@
 		"express",
 		"freecodecamp"
 	],
-	"license": "MIT"
+	"license": "MIT",
+	"engines": {
+		"node": "14.x"
+	}
 }
