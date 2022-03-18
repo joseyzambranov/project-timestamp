@@ -54,18 +54,6 @@ app.get("/api/:date_string", function (req, res) {
   
 
 })
-/* code for me
-
-app.get("/api/:date_string", function (req, res) {
-  let utc = new Date(req.params.date_string)
-  let unix = Date.parse(req.params.date_string)
-
-  res.json({unix,utc})
-  
-  //res.json({error : "Invalid Date"});
-});*/
-
-
 
 // listen for requests :)
 var listener = app.listen(port, function () {
