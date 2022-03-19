@@ -10,6 +10,8 @@ var mongo = require("mongodb")
 var mongoose = require("mongoose")
 var app = express();
 var port = process.env.PORT || 3000
+var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
+var regex = new RegExp(expression)
 
 mongoose.connect(process.env.MONGO_URI)
 
@@ -60,27 +62,32 @@ app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json())
 app.post("/api/shorturl",(req,res)=>{
   let urlRequest = req.body.url
-  let suffix = shortid.generate()
+  if(!urlRequest.match(regex)){
+    res.json({ error: 'invalid url' })
+  }else{
+    let suffix = shortid.generate()
 
-  //console.log(req)
-
-  let newUrl = new ShortUrl({
-    shortUrl : __dirname+"/api/shorturl/"+suffix,
-  originalUrl : urlRequest,
-  suffix : suffix 
-  })
-  newUrl.save((err,doc)=>{
-if(err) return console.error(err)
-//console.log("document inserted sucussfully!")
-
-res.json({
-  "save":true,
-  "original_url": newUrl.originalUrl,
-  "short_url": newUrl.shortUrl,
-  "suffix":newUrl.suffix
-  })
-  })
-
+    //console.log(req)
+  
+    let newUrl = new ShortUrl({
+      shortUrl : __dirname+"/api/shorturl/"+suffix,
+    originalUrl : urlRequest,
+    suffix : suffix 
+    })
+    newUrl.save((err,doc)=>{
+  if(err) return console.error(err)
+  //console.log("document inserted sucussfully!")
+  
+  res.json({
+    "save":true,
+    "original_url": newUrl.originalUrl,
+    "short_url": newUrl.shortUrl,
+    "suffix":newUrl.suffix
+    })
+    })
+  
+  
+  }
 
 })
 
