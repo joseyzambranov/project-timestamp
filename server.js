@@ -62,7 +62,7 @@ app.post("/api/shorturl",(req,res)=>{
   let urlRequest = req.body.url
   let suffix = shortid.generate()
 
-  console.log(req)
+  //console.log(req)
 
   let newUrl = new ShortUrl({
     shortUrl : __dirname+"/api/shorturl/"+suffix,
@@ -71,7 +71,7 @@ app.post("/api/shorturl",(req,res)=>{
   })
   newUrl.save((err,doc)=>{
 if(err) return console.error(err)
-console.log("document inserted sucussfully!")
+//console.log("document inserted sucussfully!")
 
 res.json({
   "save":true,
@@ -81,12 +81,18 @@ res.json({
   })
   })
 
-  app.get(newUrl.suffix,(req,res)=>{
-    res.sendFile(__dirname+newUrl.shortUrl);
-  })
+
 })
 
-
+app.get("/api/shorturl/:suffix",(req,res)=>{
+let generateSuffix = req.params.suffix
+ShortUrl.find({suffix:generateSuffix}).then((foundUrl)=>{
+  let urlRedirect =  foundUrl[0]
+  console.log(urlRedirect)
+  res.redirect(urlRedirect.originalUrl)
+})
+  
+})
 // function parser header
 app.get("/api/whoami",(req,res)=>{
   var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
