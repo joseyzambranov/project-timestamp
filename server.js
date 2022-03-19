@@ -56,7 +56,7 @@ app.get("/api/",(req,res)=>{
 var ShortUrl = mongoose.model("ShortUrl",new mongoose.Schema({
   shortUrl : String,
   originalUrl : String,
-  suffix : String 
+  suffix : Number 
 }))
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json())
@@ -65,14 +65,14 @@ app.post("/api/shorturl",(req,res)=>{
   if(!urlRequest.match(regex)){
     res.json({ error: 'invalid url' })
   }else{
-    let suffix = shortid.generate()
+    let suffix =0
 
     //console.log(req)
   
     let newUrl = new ShortUrl({
       shortUrl : __dirname+"/api/shorturl/"+suffix,
     originalUrl : urlRequest,
-    suffix : suffix 
+    suffix : suffix +1
     })
     newUrl.save((err,doc)=>{
   if(err) return console.error(err)
