@@ -38,12 +38,21 @@ app.get("/api/",(req,res)=>{
   res.json({unix:timeNow.getTime(),utc:timeNow.toUTCString()})
 })
 
+app.get("/api/whoami",(req,res)=>{
+  res.json({
+    ipaddress:req.headers["cf-connecting-ip"],
+    language:req.headers["accept-language"],
+    software:req.headers["user-agent"]
+  })
+})
+
+
 app.get("/api/:date_string", function (req, res) {
+  
   let dateString = req.params.date_string
   let passInValue = new Date(dateString)
   let unix = passInValue.getTime()
   let utc = passInValue.toUTCString()
-
 
   if(parseInt(dateString)>10000){
     dateInt = new Date(parseInt(dateString))
@@ -56,10 +65,6 @@ app.get("/api/:date_string", function (req, res) {
   }else{
     res.json({unix , utc});
   }
-  
-
-  
-
 })
 
 // listen for requests :)
