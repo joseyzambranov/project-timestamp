@@ -13,6 +13,7 @@ var port = process.env.PORT || 3000
 var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
 var regex = new RegExp(expression)
 
+
 mongoose.connect(process.env.MONGO_URI)
 
 
@@ -65,7 +66,7 @@ app.post("/api/shorturl",(req,res)=>{
   if(!urlRequest.match(regex)){
     res.json({ error: 'invalid url' })
   }else{
-    let suffix =0
+    let suffix =1
 
     //console.log(req)
   
@@ -92,6 +93,17 @@ app.post("/api/shorturl",(req,res)=>{
 })
 
 app.get("/api/shorturl/:shortUrl",(req,res)=>{
+  let shortUrl = req.params.shortUrl
+  ShortUrl.findOne({"shortUrl":shortUrl},(err,result)=>{
+    if(! err && result !=undefined){
+      res.redirect(result.originalUrl)
+    }else{
+      res.json({error: 'URL Does Not Exist'})
+    }
+  })
+})
+
+/*app.get("/api/shorturl/:shortUrl",(req,res)=>{
 let generateSuffix = req.params.shortUrl
 ShortUrl.find({suffix:generateSuffix}).then((foundUrl)=>{
   let urlRedirect =  foundUrl[0]
@@ -99,7 +111,7 @@ ShortUrl.find({suffix:generateSuffix}).then((foundUrl)=>{
   res.redirect(urlRedirect.originalUrl)
 })
   
-})
+})*/
 // function parser header
 app.get("/api/whoami",(req,res)=>{
   var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
