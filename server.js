@@ -2,9 +2,17 @@
 // where your node app starts
 
 // init project
+require('dotenv').config();
+const shortid = require('shortid');
+var bodyParser = require("body-parser")
 var express = require('express');
+var mongo = require("mongodb")
+var mongoose = require("mongoose")
 var app = express();
 var port = process.env.PORT || 3000
+
+mongoose.connect(process.env.MONGO_URI)
+
 
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC 
@@ -26,6 +34,10 @@ app.get("/timestamp", function (req, res) {
   res.sendFile(__dirname + '/views/timestamp.html');
 });
 
+app.get("/urlshortener", function (req, res) {
+  res.sendFile(__dirname + '/views/urlshortener.html');
+});
+
 
 // your first API endpoint... 
 app.get("/api/hello", function (req, res) {
@@ -38,6 +50,42 @@ app.get("/api/",(req,res)=>{
   res.json({unix:timeNow.getTime(),utc:timeNow.toUTCString()})
 })
 
+//function urlshortener
+var ShortUrl = mongoose.model("ShortUrl",new mongoose.Schema({
+  shortUrl : String,
+  originalUrl : String,
+  suffix : String 
+}))
+app.use(bodyParser.urlencoded({extended:false}))
+app.use(bodyParser.json())
+app.post("/api/shorturl",(req,res)=>{
+  let urlRequest = req.body.url
+  let suffix = shortid.generate()
+
+  console.log(req)
+
+  let newUrl = new ShortUrl({
+    shortUrl : __dirname+"/api/shorturl/"+suffix,
+  originalUrl : urlRequest,
+  suffix : suffix 
+  })
+  newUrl.save((err,doc)=>{
+if(err) return console.error(err)
+console.log("document inserted sucussfully!")
+
+res.json({
+  "save":true,
+  "original_url": newUrl.originalUrl,
+  "short_url": newUrl.shortUrl,
+  "suffix":newUrl.suffix
+  })
+  })
+
+ 
+})
+
+
+// function parser header
 app.get("/api/whoami",(req,res)=>{
   var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
   res.json({
@@ -47,7 +95,7 @@ app.get("/api/whoami",(req,res)=>{
   })
 })
 
-
+//funciton timestamp
 app.get("/api/:date_string", function (req, res) {
   
   let dateString = req.params.date_string
