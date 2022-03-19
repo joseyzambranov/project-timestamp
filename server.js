@@ -92,8 +92,8 @@ app.post("/api/shorturl",(req,res)=>{
 
 })
 
-app.get("/api/shorturl/:shortUrl",(req,res)=>{
-  let shortUrl = req.params.shortUrl
+app.get("/api/shorturl/:short_url",(req,res)=>{
+  let shortUrl = req.params.short_url
   ShortUrl.findOne({"shortUrl":shortUrl},(err,result)=>{
     if(! err && result !=undefined){
       res.redirect(result.originalUrl)
