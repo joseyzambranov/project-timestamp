@@ -54,9 +54,9 @@ app.get("/api/",(req,res)=>{
 
 //function urlshortener
 var ShortUrl = mongoose.model("ShortUrl",new mongoose.Schema({
-  shortUrl : String,
+  shortUrl : Number,
   originalUrl : String,
-  suffix : Number 
+  
 }))
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json())
@@ -70,19 +70,19 @@ app.post("/api/shorturl",(req,res)=>{
     //console.log(req)
   
     let newUrl = new ShortUrl({
-      shortUrl : __dirname+"/api/shorturl/"+suffix,
+      shortUrl : suffix +1,
     originalUrl : urlRequest,
-    suffix : suffix +1
+    
     })
     newUrl.save((err,doc)=>{
   if(err) return console.error(err)
   //console.log("document inserted sucussfully!")
   
   res.json({
-    "save":true,
+    
     "original_url": newUrl.originalUrl,
     "short_url": newUrl.shortUrl,
-    "suffix":newUrl.suffix
+    
     })
     })
   
@@ -91,8 +91,8 @@ app.post("/api/shorturl",(req,res)=>{
 
 })
 
-app.get("/api/shorturl/:suffix",(req,res)=>{
-let generateSuffix = req.params.suffix
+app.get("/api/shorturl/:shortUrl",(req,res)=>{
+let generateSuffix = req.params.shortUrl
 ShortUrl.find({suffix:generateSuffix}).then((foundUrl)=>{
   let urlRedirect =  foundUrl[0]
   console.log(urlRedirect)
