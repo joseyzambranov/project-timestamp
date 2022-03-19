@@ -81,7 +81,9 @@ res.json({
   })
   })
 
- 
+  app.get(newUrl.suffix,(req,res)=>{
+    res.sendFile(__dirname+newUrl.shortUrl);
+  })
 })
 
 
