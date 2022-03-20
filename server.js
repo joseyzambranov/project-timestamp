@@ -12,7 +12,7 @@ var app = express();
 var port = process.env.PORT || 3000
 var expression = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi;
 var regex = new RegExp(expression)
-
+let suffix =1
 
 mongoose.connect(process.env.MONGO_URI)
 
@@ -66,12 +66,12 @@ app.post("/api/shorturl",(req,res)=>{
   if(!urlRequest.match(regex)){
     res.json({ error: 'invalid url' })
   }else{
-    let suffix =1
+    
 
     //console.log(req)
   
     let newUrl = new ShortUrl({
-      shortUrl : suffix +1,
+      shortUrl : suffix ++,
     originalUrl : urlRequest,
     
     })
