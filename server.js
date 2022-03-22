@@ -81,7 +81,7 @@ if(err) return console.error(err)
  })
  res.json({
    "username":newUserFccB.username,
-   "id":newUserFccB.id  
+   "_id":newUserFccB.id  
 })
 })
 //Add exercises
