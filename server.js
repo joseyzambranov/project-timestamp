@@ -40,6 +40,9 @@ app.get("/timestamp", function (req, res) {
 app.get("/urlshortener", function (req, res) {
   res.sendFile(__dirname + '/views/urlshortener.html');
 });
+app.get("/exercise-tracker", function (req, res) {
+  res.sendFile(__dirname + '/views/exercise-tracker.html');
+});
 
 
 // your first API endpoint... 
@@ -52,6 +55,61 @@ app.get("/api/",(req,res)=>{
   let timeNow = new Date()
   res.json({unix:timeNow.getTime(),utc:timeNow.toUTCString()})
 })
+
+//function exercise-tracker
+var UserFccB = mongoose.model("UserFccB",new mongoose.Schema({
+  username:String,
+  count:Number,
+  log:[{
+    description:String,
+    duration:Number,
+    date:Date
+  }]
+}))
+//app.use(bodyParser.urlencoded({extended:false}))
+app.use(bodyParser.urlencoded({extended:false}))
+app.use(bodyParser.json())
+//create user
+app.post("/api/users",(req,res)=>{
+let user = req.body.username
+ let newUserFccB = new UserFccB({
+   username:user
+ })
+ newUserFccB.save((err,doc)=>{
+if(err) return console.error(err)
+
+ })
+ res.json({
+   "username":newUserFccB.username,
+   "id":newUserFccB.id  
+})
+})
+//Add exercises
+
+app.post("/api/users/:_id/exercises",(req,res)=>{
+
+  let reqId = req.params._id
+  let rCount = suffix+1
+  let rDescription = req.body.description
+  let rDuration = req.body.duration
+  let rDate = req.body.date
+console.log(rCount+"<=count")
+  UserFccB.findOneAndUpdate({"_id":reqId},{  
+    count:rCount,
+    description:rDescription,
+    duration:rDuration,
+    date:rDate
+    
+  },{new:true},(err,update)=>{
+      if(err) return console.log(err)
+      return console.log(update)
+  })
+  UserFccB.findById(reqId,(err,data)=>{
+    if(err)console.error(err)
+    res.json({data})
+  })
+  
+  })
 
 //function urlshortener
 var ShortUrl = mongoose.model("ShortUrl",new mongoose.Schema({
@@ -103,15 +161,6 @@ app.get("/api/shorturl/:short_url",(req,res)=>{
   })
 })
 
-/*app.get("/api/shorturl/:shortUrl",(req,res)=>{
-let generateSuffix = req.params.shortUrl
-ShortUrl.find({suffix:generateSuffix}).then((foundUrl)=>{
-  let urlRedirect =  foundUrl[0]
-  console.log(urlRedirect)
-  res.redirect(urlRedirect.originalUrl)
-})
-  
-})*/
 // function parser header
 app.get("/api/whoami",(req,res)=>{
   var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
