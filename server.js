@@ -149,7 +149,7 @@ app.get("/api/users/:_id/logs",(req,res)=>{
   let reqId = req.params._id
   User.findById(reqId,(err,data)=>{
     if(err) return console.error(err)
-    data["count"] = data.count.length
+    data["count"] = data.log.length
     res.json(data)
   })
 })
