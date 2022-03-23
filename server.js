@@ -152,20 +152,7 @@ app.get("/api/users/:_id/logs",(req,res)=>{
     res.json(data.count)
   })
 })
-app.get("/api/users/:_id/logs",(req,res)=>{
-  let reqId = req.params._id
-  User.findById(reqId,(err,data)=>{
-    if(err) return console.error(err)
-    res.json(data.log)
-  })
-})
-app.get("/api/users/:_id/logs",(req,res)=>{
-  let reqId = req.params._id
-  User.findById(reqId,(err,data)=>{
-    if(err) return console.error(err)
-    res.json(data)
-  })
-})
+
 
 //function urlshortener
 var ShortUrl = mongoose.model("ShortUrl",new mongoose.Schema({
