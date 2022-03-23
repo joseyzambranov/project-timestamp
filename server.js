@@ -129,8 +129,6 @@ let newExerciseFccB = new Exercise({
   date:rDate
 })
 
-
-
   User.findByIdAndUpdate(reqId,{  
     $push: {log: newExerciseFccB}
   },{new:true},(err,data)=>{
@@ -142,6 +140,30 @@ let newExerciseFccB = new Exercise({
       obj["duration"] = parseInt(newExerciseFccB.duration)
       obj["description"] = newExerciseFccB.description
       res.json(obj)
+  })
+})
+//You can make a GET request to /api/users/:_id/logs to retrieve a full
+// exercise log of any user.
+
+app.get("/api/users/:_id/logs",(req,res)=>{
+  let reqId = req.params._id
+  User.findById(reqId,(err,data)=>{
+    if(err) return console.error(err)
+    res.json(data.count)
+  })
+})
+app.get("/api/users/:_id/logs",(req,res)=>{
+  let reqId = req.params._id
+  User.findById(reqId,(err,data)=>{
+    if(err) return console.error(err)
+    res.json(data.log)
+  })
+})
+app.get("/api/users/:_id/logs",(req,res)=>{
+  let reqId = req.params._id
+  User.findById(reqId,(err,data)=>{
+    if(err) return console.error(err)
+    res.json(data)
   })
 })
 
