@@ -57,23 +57,41 @@ app.get("/api/",(req,res)=>{
 })
 
 //function exercise-tracker
+/*var ExerciseFccB = mongoose.model("ExerciseFccB",new mongoose.Schema({
+  description:String,
+  duration:Number,
+  date:String
+}))
+
 var UserFccB = mongoose.model("UserFccB",new mongoose.Schema({
   username:String,
   count:Number,
-  log:[{
-    description:String,
-    duration:Number,
-    date:Date
-  }]
-}))
+  log:[ExerciseFccB]
+}))*/
+let exerciseSchema = new mongoose.Schema({
+  description:String,
+  duration:Number,
+  date: String
+})
+
+let userSchema = new mongoose.Schema({
+  username: {type: String, required: true},
+  count:Number,
+  log: [exerciseSchema]
+})
+
+let User = mongoose.model('User', userSchema)
+let Exercise = mongoose.model('Exercise', exerciseSchema)
+
 //app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json())
 //create user
 app.post("/api/users",(req,res)=>{
 let user = req.body.username
- let newUserFccB = new UserFccB({
-   username:user
+ let newUserFccB = new User({
+   username:user,
+   count:suffix++
  })
  newUserFccB.save((err,doc)=>{
 if(err) return console.error(err)
@@ -84,32 +102,48 @@ if(err) return console.error(err)
    "_id":newUserFccB.id  
 })
 })
+
+//get user
+
+app.get("/api/users",(req,res)=>{
+  User.find({}).exec((err,data)=>{
+    if(err) return console.error(err)
+    res.json(data)
+  })
+})
 //Add exercises
 
 app.post("/api/users/:_id/exercises",(req,res)=>{
 
   let reqId = req.params._id
-  let rCount = suffix+1
   let rDescription = req.body.description
   let rDuration = req.body.duration
   let rDate = req.body.date
-console.log(rCount+"<=count")
-  UserFccB.findOneAndUpdate({"_id":reqId},{  
-    count:rCount,
-    description:rDescription,
-    duration:rDuration,
-    date:rDate
-    
-  },{new:true},(err,update)=>{
+  if(rDate === ''){
+    rDate = new Date().toDateString()
+  }
+
+let newExerciseFccB = new Exercise({
+  description:rDescription,
+  duration:rDuration,
+  date:rDate
+})
+
+
+
+  User.findByIdAndUpdate(reqId,{  
+    $push: {log: newExerciseFccB}
+  },{new:true},(err,data)=>{
       if(err) return console.log(err)
-      return console.log(update)
+      let obj = {}
+      obj["_id"] = data.id
+      obj["username"] = data.username
+      obj["date"] = new Date(newExerciseFccB.date).toDateString()
+      obj["duration"] = parseInt(newExerciseFccB.duration)
+      obj["description"] = newExerciseFccB.description
+      res.json(obj)
   })
-  UserFccB.findById(reqId,(err,data)=>{
-    if(err)console.error(err)
-    res.json({data})
-  })
-  
-  })
+})
 
 //function urlshortener
 var ShortUrl = mongoose.model("ShortUrl",new mongoose.Schema({
