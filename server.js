@@ -71,7 +71,7 @@ var UserFccB = mongoose.model("UserFccB",new mongoose.Schema({
 let exerciseSchema = new mongoose.Schema({
   description:String,
   duration:Number,
-  date: Date
+  date:Date
 })
 
 let userSchema = new mongoose.Schema({
