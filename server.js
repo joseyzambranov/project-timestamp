@@ -146,7 +146,7 @@ let newExerciseFccB = new Exercise({
 // exercise log of any user.
 
 app.get("/api/users/:_id/logs",(req,res)=>{
-  /*let reqId = req.params._id
+  let reqId = req.params._id
   User.findById(reqId,(err,data)=>{
     if(err) return console.error(err)
     let resultData = data
@@ -178,10 +178,20 @@ app.get("/api/users/:_id/logs",(req,res)=>{
 
     
     resultData["count"] = data.log.length
-    res.json(resultData)
-  })*/
+    const username = resultData.username
+    const id=resultData.id
+    const count = resultData.count
+    const rawLog = resultData.log
+    const log = rawLog.map((l)=>({
+      description:l.description,
+      duration:l.duration,
+      date:l.date.toDateString()
+    }))
+    console.log(log)
+    res.json({username,id,count,log})
+  })
 
-const {from,to,limit}=req.query
+/*const {from,to,limit}=req.query
 const{id} = req.params._id
 User.findById(id,(err,userDate)=>{
   if(err||!userDate){
@@ -217,7 +227,7 @@ User.findById(id,(err,userDate)=>{
         }
     })
   }
-})
+})*/
 
 })
 
