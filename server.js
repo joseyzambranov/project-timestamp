@@ -71,7 +71,7 @@ var UserFccB = mongoose.model("UserFccB",new mongoose.Schema({
 let exerciseSchema = new mongoose.Schema({
   description:String,
   duration:Number,
-  date: String
+  date: Date
 })
 
 let userSchema = new mongoose.Schema({
@@ -167,8 +167,8 @@ app.get("/api/users/:_id/logs",(req,res)=>{
 
       resultData.log = resultData.log.filter((dateFilter)=>{
         let sessionDateFilter = new Date(dateFilter.date).getTime()
-
-        return sessionDateFilter >= fromDate && sessionDateFilter <= toDate
+        sessionDateFilter >= fromDate && sessionDateFilter <= toDate
+        return sessionDateFilter.toDateString()
       })
     }
     if(req.query.limit){
