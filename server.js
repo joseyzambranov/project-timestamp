@@ -126,7 +126,7 @@ app.post("/api/users/:_id/exercises",(req,res)=>{
 let newExerciseFccB = new Exercise({
   description:rDescription,
   duration:rDuration,
-  date:rDate
+  date:new Date(rDate).toDateString()
 })
 
   User.findByIdAndUpdate(reqId,{  
@@ -149,8 +149,36 @@ app.get("/api/users/:_id/logs",(req,res)=>{
   let reqId = req.params._id
   User.findById(reqId,(err,data)=>{
     if(err) return console.error(err)
-    data["count"] = data.log.length
-    res.json(data)
+    let resultData = data
+    
+    if(req.query.from||req.query.to){
+      let fromDate = new Date(0)
+      let toDate = new Date()
+
+      if(req.query.from){
+        fromDate=new Date(req.from)
+      }
+      if(req.query.to){
+        toDate = new Date(req.to)
+      }
+
+      fromDate = fromDate.getTime()
+      toDate = toDate.getTime()
+
+      resultData.log = resultData.log.filter((dateFilter)=>{
+        let sessionDateFilter = new Date(dateFilter.date).getTime()
+
+        return sessionDateFilter >= fromDate && sessionDateFilter <= toDate
+      })
+    }
+    if(req.query.limit){
+      resultData.log = resultData.log.slice(0,req.query.limit)
+    }
+
+
+    
+    resultData["count"] = data.log.length
+    res.json(resultData)
   })
 })
 
