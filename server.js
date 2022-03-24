@@ -146,7 +146,7 @@ let newExerciseFccB = new Exercise({
 // exercise log of any user.
 
 app.get("/api/users/:_id/logs",(req,res)=>{
-  let reqId = req.params._id
+  /*let reqId = req.params._id
   User.findById(reqId,(err,data)=>{
     if(err) return console.error(err)
     let resultData = data
@@ -179,7 +179,46 @@ app.get("/api/users/:_id/logs",(req,res)=>{
     
     resultData["count"] = data.log.length
     res.json(resultData)
-  })
+  })*/
+
+const {from,to,limit}=req.query
+const{id} = req.params._id
+User.findById(id,(err,userDate)=>{
+  if(err||!userDate){
+    res.send("Could not find user")
+  }else{
+    let dateObj ={}
+    if(from){
+      dateObj["$gte"]=new Date(from)
+    }
+    if(to){
+      dateObj["$lte"]=new Date(to)
+    }
+    let filter = {
+      userId: id
+    }
+    if(from||to){
+      filter.date=dateObj
+    }
+    let noNullLimit = limit ?? 500
+    Exercise.find(filter).limit(+noNullLimit).exec((err,data)=>{
+        if(err||!data){
+          res.json([])
+        }else{
+          const count = data.length
+          const rawLog = data
+          const {username,_id} = userDate
+          const log = rawLog.map((l)=>({
+            description:l.description,
+            duration:l.duration,
+            date:l.date.toDateString()
+          }))
+          res.json({username,count,_id,log})
+        }
+    })
+  }
+})
+
 })
 
 
