@@ -151,14 +151,14 @@ app.get("/api/users/:_id/logs",(req,res)=>{
     if(err) return console.error(err)
     let resultData = data
     
-    if(req.query.from||req.query.to){
+    if(req.from||req.to){
       let fromDate = new Date(0)
       let toDate = new Date()
 
-      if(req.query.from){
+      if(req.from){
         fromDate=new Date(req.from)
       }
-      if(req.query.to){
+      if(req.to){
         toDate = new Date(req.to)
       }
 
@@ -171,24 +171,25 @@ app.get("/api/users/:_id/logs",(req,res)=>{
         return sessionDateFilter.toDateString()
       })
     }
-    if(req.query.limit){
-      resultData.log = resultData.log.slice(0,req.query.limit)
+    if(req.limit){
+      resultData.log = resultData.log.slice(0,req.limit)
     }
 
 
     
-    resultData["count"] = data.log.length
+    resultData["count"] = resultData.log.length
     /*const username = resultData.username
-    const id=resultData.id
+    const _id=resultData.id
     const count = resultData.count
     const rawLog = resultData.log
     const log = rawLog.map((l)=>({
       description:l.description,
-      duration:l.duration,
+      duration:parseInt(l.duration),
       date:l.date.toDateString()
     }))*/
     
-    res.json(resultData)
+  // res.json({username,count,_id,log})
+   res.json(resultData)
   })
 
 /*const {from,to,limit}=req.query
