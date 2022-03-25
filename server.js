@@ -148,18 +148,18 @@ let newExerciseFccB = new Exercise({
 app.get("/api/users/:_id/logs",(req,res)=>{
   let reqId = req.params._id
   User.findById(reqId,(err,data)=>{
-    if(err) return console.error(err)
-    let resultData = data
+    if(!err){
+      let resultData = data
     
-    if(req.from||req.to){
+    if(req.query.from||req.query.to){
       let fromDate = new Date(0)
       let toDate = new Date()
 
-      if(req.from){
-        fromDate=new Date(req.from)
+      if(req.query.from){
+        fromDate=new Date(req.query.from)
       }
-      if(req.to){
-        toDate = new Date(req.to)
+      if(req.query.to){
+        toDate = new Date(req.query.to)
       }
 
       fromDate = fromDate.getTime()
@@ -167,29 +167,31 @@ app.get("/api/users/:_id/logs",(req,res)=>{
 
       resultData.log = resultData.log.filter((dateFilter)=>{
         let sessionDateFilter = new Date(dateFilter.date).getTime()
-        sessionDateFilter >= fromDate && sessionDateFilter <= toDate
-        return sessionDateFilter.toDateString()
+        
+        return sessionDateFilter >= fromDate && sessionDateFilter <= toDate
       })
     }
-    if(req.limit){
-      resultData.log = resultData.log.slice(0,req.limit)
+    if(req.query.limit){
+      resultData.log = resultData.log.slice(0,req.query.limit)
     }
 
 
-    
-    resultData["count"] = resultData.log.length
+    resultData = resultData.toJSON()
+    resultData["count"] = data.log.length
     /*const username = resultData.username
     const _id=resultData.id
-    const count = resultData.count
-    const rawLog = resultData.log
-    const log = rawLog.map((l)=>({
+    const count = resultData.count*/
+    //const rawLog = resultData.log
+    resultData["log"]= resultData.log.map((l)=>({
       description:l.description,
-      duration:parseInt(l.duration),
-      date:l.date.toDateString()
-    }))*/
+      duration:l.duration,
+      date:new Date(l.date).toDateString()
+    }))
+  
     
   // res.json({username,count,_id,log})
    res.json(resultData)
+  }
   })
 
 /*const {from,to,limit}=req.query
