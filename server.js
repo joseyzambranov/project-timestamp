@@ -69,19 +69,29 @@ app.get("/api/", (req, res) => {
 })
 
 //file medatada
-/*var FileMetadata = mongoose.model("FileMetadata", new mongoose.Schema({
-  file: String
+var FileMetadata = mongoose.model("FileMetadata", new mongoose.Schema({
+  name: String,
+  type:String,
+  size:String
 
-}))*/
+}))
 
 app.post("/api/fileanalyse",multer().single("upfile"),(req,res)=>{
   let reqfile = req.file
- 
-  res.json({
+ let newFileMetadata = new FileMetadata({
+  name:reqfile.originalname,
+  type:reqfile.mimetype,
+  size:reqfile.size
+ })
+ newFileMetadata.save((err,doc)=>{
+   if(err) return console.error(err)
+   res.json({
     name:reqfile.originalname,
     type:reqfile.mimetype,
     size:reqfile.size
   })
+ })
+  
 })
 
 //function exercise-tracker
