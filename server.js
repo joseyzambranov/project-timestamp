@@ -178,6 +178,7 @@ app.get("/api/users/:_id/logs",(req,res)=>{
 
     
     resultData["count"] = data.log.length
+    /*
     const username = resultData.username
     const id=resultData.id
     const count = resultData.count
@@ -187,8 +188,8 @@ app.get("/api/users/:_id/logs",(req,res)=>{
       duration:l.duration,
       date:l.date.toDateString()
     }))
-    console.log(log)
-    res.json({username,id,count,log})
+    */
+    res.json({resultData})
   })
 
 /*const {from,to,limit}=req.query
