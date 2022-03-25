@@ -71,7 +71,7 @@ var UserFccB = mongoose.model("UserFccB",new mongoose.Schema({
 let exerciseSchema = new mongoose.Schema({
   description:String,
   duration:Number,
-  date:Date
+  date:String
 })
 
 let userSchema = new mongoose.Schema({
@@ -144,7 +144,51 @@ let newExerciseFccB = new Exercise({
 })
 //You can make a GET request to /api/users/:_id/logs to retrieve a full
 // exercise log of any user.
+app.get("/api/users/:_id/logs",async(req,res)=>{
+  if(req.params._id){
+    await User.findById(req.params._id,(err,result)=>{
+    if(!err){
+      let responseObj={}
+      responseObj["_id"]=result._id
+      responseObj["username"]=result.username
+      responseObj["count"]=result.log.length
+      
+      if(req.query.limit){
+        responseObj["log"]=result.log.slice(0,req.query.limit)
+      }else{
+        responseObj["log"]=result.log.map(log=>({
+        description:log.description,
+        duration:log.duration,
+        date:new Date(log.date).toDateString()
+      }))
+      }
+      if(req.query.from||req.query.to){
+        let fromDate=new Date(0)
+        let toDate=new Date()
+        if(req.query.from){
+          fromDate=new Date(req.query.from)
+        }
+        if(req.query.to){
+          toDate=new Date(req.query.to)
+        }
+        fromDate=fromDate.getTime()
+        toDate=toDate.getTime()
+        responseObj["log"]=result.log.filter((session)=>{
+          let sessionDate=new Date(session.date).getTime()
 
+          return sessionDate>=fromDate&&sessionDate<=toDate
+        })
+      }
+      res.json(responseObj)
+    }else{
+      res.json({err:err})
+    }
+  })
+  }else{
+    res.json({user:"user not found with this id"})
+  }
+})
+/*
 app.get("/api/users/:_id/logs",(req,res)=>{
   let reqId = req.params._id
   User.findById(reqId,(err,data)=>{
@@ -167,8 +211,8 @@ app.get("/api/users/:_id/logs",(req,res)=>{
 
       resultData.log = resultData.log.filter((dateFilter)=>{
         let sessionDateFilter = new Date(dateFilter.date).getTime()
-        
-        return sessionDateFilter >= fromDate && sessionDateFilter <= toDate
+        let resutlDate = sessionDateFilter >= fromDate && sessionDateFilter <= toDate
+        return new Date(resutlDate).toDateString()
       })
     }
     if(req.query.limit){
@@ -176,21 +220,16 @@ app.get("/api/users/:_id/logs",(req,res)=>{
     }
 
 
-    resultData = resultData.toJSON()
-    resultData["count"] = data.log.length
-    /*const username = resultData.username
-    const _id=resultData.id
-    const count = resultData.count*/
-    //const rawLog = resultData.log
-    const log= resultData.log.map((l)=>({
+  
+    /*const log= resultData.log.map((l)=>({
       description:l.description,
       duration:l.duration,
       date:new Date(l.date).toDateString()
     }))
   
     
-  // res.json({username,count,_id,log})
-   res.json({username:data.username,
+ 
+ res.json({username:data.username,
               _id:reqId,
               count:resultData.count,
               log:log
@@ -199,47 +238,10 @@ app.get("/api/users/:_id/logs",(req,res)=>{
   }
   })
 
-/*const {from,to,limit}=req.query
-const{id} = req.params._id
-User.findById(id,(err,userDate)=>{
-  if(err||!userDate){
-    res.send("Could not find user")
-  }else{
-    let dateObj ={}
-    if(from){
-      dateObj["$gte"]=new Date(from)
-    }
-    if(to){
-      dateObj["$lte"]=new Date(to)
-    }
-    let filter = {
-      userId: id
-    }
-    if(from||to){
-      filter.date=dateObj
-    }
-    let noNullLimit = limit ?? 500
-    Exercise.find(filter).limit(+noNullLimit).exec((err,data)=>{
-        if(err||!data){
-          res.json([])
-        }else{
-          const count = data.length
-          const rawLog = data
-          const {username,_id} = userDate
-          const log = rawLog.map((l)=>({
-            description:l.description,
-            duration:l.duration,
-            date:l.date.toDateString()
-          }))
-          res.json({username,count,_id,log})
-        }
-    })
-  }
-})*/
 
 })
 
-
+*/
 //function urlshortener
 var ShortUrl = mongoose.model("ShortUrl",new mongoose.Schema({
   shortUrl : Number,
