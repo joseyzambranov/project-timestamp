@@ -182,7 +182,7 @@ app.get("/api/users/:_id/logs",(req,res)=>{
     const _id=resultData.id
     const count = resultData.count*/
     //const rawLog = resultData.log
-    resultData["log"]= resultData.log.map((l)=>({
+    const log= resultData.log.map((l)=>({
       description:l.description,
       duration:l.duration,
       date:new Date(l.date).toDateString()
@@ -190,7 +190,12 @@ app.get("/api/users/:_id/logs",(req,res)=>{
   
     
   // res.json({username,count,_id,log})
-   res.json(resultData)
+   res.json({username:data.username,
+              _id:reqId,
+              count:resultData.count,
+              log:log
+
+            })
   }
   })
 
