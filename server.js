@@ -118,8 +118,8 @@ app.post("/api/users/:_id/exercises",(req,res)=>{
   let reqId = req.params._id
   let rDescription = req.body.description
   let rDuration = req.body.duration
-  let rDate = req.body.date
-  if(rDate === ''){
+  let rDate = new Date(req.body.date).toDateString()
+  if(rDate === ''||rDate === "Invalid Date"){
     rDate = new Date().toDateString()
   }
 
@@ -144,51 +144,7 @@ let newExerciseFccB = new Exercise({
 })
 //You can make a GET request to /api/users/:_id/logs to retrieve a full
 // exercise log of any user.
-app.get("/api/users/:_id/logs",async(req,res)=>{
-  if(req.params._id){
-    await User.findById(req.params._id,(err,result)=>{
-    if(!err){
-      let responseObj={}
-      responseObj["_id"]=result._id
-      responseObj["username"]=result.username
-      responseObj["count"]=result.log.length
-      
-      if(req.query.limit){
-        responseObj["log"]=result.log.slice(0,req.query.limit)
-      }else{
-        responseObj["log"]=result.log.map(log=>({
-        description:log.description,
-        duration:log.duration,
-        date:new Date(log.date).toDateString()
-      }))
-      }
-      if(req.query.from||req.query.to){
-        let fromDate=new Date(0)
-        let toDate=new Date()
-        if(req.query.from){
-          fromDate=new Date(req.query.from)
-        }
-        if(req.query.to){
-          toDate=new Date(req.query.to)
-        }
-        fromDate=fromDate.getTime()
-        toDate=toDate.getTime()
-        responseObj["log"]=result.log.filter((session)=>{
-          let sessionDate=new Date(session.date).getTime()
 
-          return sessionDate>=fromDate&&sessionDate<=toDate
-        })
-      }
-      res.json(responseObj)
-    }else{
-      res.json({err:err})
-    }
-  })
-  }else{
-    res.json({user:"user not found with this id"})
-  }
-})
-/*
 app.get("/api/users/:_id/logs",(req,res)=>{
   let reqId = req.params._id
   User.findById(reqId,(err,data)=>{
@@ -220,16 +176,21 @@ app.get("/api/users/:_id/logs",(req,res)=>{
     }
 
 
-  
-    /*const log= resultData.log.map((l)=>({
+    resultData = resultData.toJSON()
+    resultData["count"] = data.log.length
+    /*const username = resultData.username
+    const _id=resultData.id
+    const count = resultData.count*/
+    //const rawLog = resultData.log
+    const log= resultData.log.map((l)=>({
       description:l.description,
       duration:l.duration,
       date:new Date(l.date).toDateString()
     }))
   
     
- 
- res.json({username:data.username,
+  // res.json({username,count,_id,log})
+   res.json({username:data.username,
               _id:reqId,
               count:resultData.count,
               log:log
@@ -241,7 +202,7 @@ app.get("/api/users/:_id/logs",(req,res)=>{
 
 })
 
-*/
+
 //function urlshortener
 var ShortUrl = mongoose.model("ShortUrl",new mongoose.Schema({
   shortUrl : Number,
